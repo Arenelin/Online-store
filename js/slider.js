@@ -2,15 +2,48 @@
 
 const arrayOfBtnsTabs = document.querySelectorAll('.tabs > button');
 
+
+
 let tabActiveId = "goods";
 let activeTab = search();
 activeTab.classList.add('active');
 
 const tabs = document.querySelector('.tabs');
 tabs.insertAdjacentHTML("afterend", renderGoods());
+
+
+
+
+
+const arrayOfBtnsCart = document.querySelectorAll('button[data-count="true"]');
+
+for (let i = 0; i < arrayOfBtnsCart.length; i++){
+   arrayOfBtnsCart[i].addEventListener('click', arrayCount);
+}
+
+let array = [];
+const tabWithCounter = document.querySelector('button[data-goods-count]');
+console.log(tabWithCounter);
+function arrayCount() {
+   let product = productItem();
+   array.push(product);
+   tabWithCounter.dataset.goodsCount = array.length;
+}
+function productItem() {
+   return {
+      name: "Серая футболка",
+      price: 1800,
+   }
+}
+
+
+
 for (let i = 0; i < arrayOfBtnsTabs.length; i++) {
    arrayOfBtnsTabs[i].addEventListener('click', clickHandler);
 }
+
+
+
 
 function clickHandler(event) {
    activeTab = search();
@@ -67,7 +100,7 @@ function renderGoods() {
      <div class="item__descr">
        <p class="item__name">Серая футболка</p>
        <p class="item__price">1800 рублей</p>
-       <button class="item__btn">В корзину</button>
+       <button data-count="true" class="item__btn">В корзину</button>
      </div>
    </div>
    <div class="item">
@@ -75,7 +108,7 @@ function renderGoods() {
      <div class="item__descr">
        <p class="item__name">Голубая футболка</p>
        <p class="item__price">1200 рублей</p>
-       <button class="item__btn">В корзину</button>
+       <button data-count="true" class="item__btn">В корзину</button>
      </div>
    </div>
    <div class="item">
@@ -83,7 +116,7 @@ function renderGoods() {
      <div class="item__descr">
        <p class="item__name">Майка на выбор</p>
        <p class="item__price">800 рублей</p>
-       <button class="item__btn">В корзину</button>
+       <button data-count="true" class="item__btn">В корзину</button>
      </div>
    </div>
  </div>

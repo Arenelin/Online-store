@@ -18,6 +18,9 @@
 .tabs-active {
 }
 .tabs-cart {
+   &::after{
+      content: attr(data-goods-count);
+   }
 }
 .product-items {
    display: flex;
