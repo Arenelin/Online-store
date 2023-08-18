@@ -1,0 +1,42 @@
+@use 'sass:math'; //Данная строчка нужна для того,чтобы math корректно работал//
+
+// Расчет процентов по формуле//
+@function prc($pxOne, $pxTwo) {
+   $result: math.div($pxOne,$pxTwo) * 100%;
+   @return $result;
+}
+// Расчет rem по формуле//
+@function rem($px) {
+   $result: math.div($px, 16) + rem;
+   @return $result;
+}
+// Расчет em по формуле//
+@function em($px) {
+   $result: math.div($px, 16) + em;
+   @return $result;
+}
+
+$maxWidth: 1230; //Здесь указываю ширину контейнера вместе с padding's//
+$maxWidthContainer: 1230; //Здесь задаем ширину нашего контейнера вместе с padding's//
+$property: "font-size";
+
+@mixin adaptiv-value($proprety, $startSize, $minSize, $type) {
+   $addSize: $startSize - $minSize;
+   @if $type==1 {
+      //Только если меньше контейнера
+      #{$property}: $startSize + px;
+      @media (max-width: #{$maxWidthContainer + px}) {
+         #{$property}: calc(#{$minSize + px} + #{$addSize} * ((100vw - 320px) / #{$maxWidthContainer - 320}));
+      }
+   } @else if $type==2 {
+      //Только если больше контейнера
+      #{$property}: $startSize + px;
+      @media (min-width: #{$maxWidthContainer + px}) {
+         #{$property}: calc(#{$minSize + px} + #{$addSize} * ((100vw - 320px) / #{$maxWidth - 320}));
+      }
+   } 
+   @else {
+      //Всегда
+      #{$property}: calc(#{$minSize + px} + #{$addSize} * ((100vw - 320px) / #{$maxWidth - 320}));
+   }
+}
