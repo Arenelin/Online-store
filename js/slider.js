@@ -45,10 +45,6 @@ function findActiveBtnTab() {
    return document.querySelector(`button[data-id="${tabActiveId}"]`);
 }
 
-//Нахождение и присвоение обработчика для кнопок "В корзину"
-const arrayOfBtnsCart = document.querySelectorAll('button[data-count="true"]');
-addListenerForBtns(arrayOfBtnsCart, addProductsInCart);
-
 //Цикл для добавления слушателя к кнопкам
 function addListenerForBtns(elements, callback) {
    for (let i = 0; i < elements.length; i++) {
@@ -59,15 +55,19 @@ function addListenerForBtns(elements, callback) {
 //Создание массива для заполнения корзины
 const arrayOfProductsInCart = [];
 const tabWithCounter = document.querySelector('button[data-goods-count]');
-function addProductsInCart() {
-   let product = createProductItem();
-   arrayOfProductsInCart.push(product);
-   tabWithCounter.dataset.goodsCount = arrayOfProductsInCart.length;
+function addProductsInCart(product) {
+   return () => {
+      arrayOfProductsInCart.push(product);
+      console.log(arrayOfProductsInCart);
+      tabWithCounter.dataset.goodsCount = arrayOfProductsInCart.length;
+   }
+
 }
-function createProductItem() {
+function createProductItem(product) {
    return {
-      name: "Серая футболка",
-      price: 1800,
+      name: product.name ? product.name : 'Имя неизвестно',
+      price: product.price ? product.price : '0',
+      imgSrc: product.imgSrc ? product.imgSrc : '/img/01.png',
    }
 }
 
@@ -76,20 +76,30 @@ function renderGoods() {
    const div = document.createElement('div');
    div.dataset.activeTabContent = 'true';
    div.className = "product-items";
+
    for (let i = 0; i < goods.length; i++) {
-      const product = goods[i];
-      div.insertAdjacentHTML('beforeend', `
-      <div class="item">
-     <img src="${product.imgSrc}" class= "item__img" alt ="t-shirt one">
-     <div class="item__descr">
-       <p class="item__name">${product.name}</p>
-       <p class="item__price">${product.price}</p>
-       <button data-count="true" class="item__btn">В корзину</button>
-     </div>
-   </div>`);
+      const product = createProductItem(goods[i]);
+
+      const clickHandler = addProductsInCart(product);
+
+      const button = document.createElement('button');
+      button.className = "item__btn";
+      button.textContent = 'В корзину';
+      button.addEventListener('click', clickHandler);
+
+      const productBlock = document.createElement('div');
+      productBlock.className = "item";
+      productBlock.innerHTML = `
+      <img src="${product.imgSrc}" class= "item__img" alt ="t-shirt one">
+      <div class="item__descr">
+         <p class="item__name">${product.name}</p>
+         <p class="item__price">${product.price}</p>
+      </div>
+      `;
+      productBlock.querySelector('.item__descr').append(button);
+      div.append(productBlock);
    }
    return div;
-
 }
 
 //Контент корзины
