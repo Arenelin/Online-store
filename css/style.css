@@ -169,3 +169,21 @@ h1, h2, h3, h4, h5, h6 {
   color: rgb(95, 108, 231);
   pointer-events: none;
 }
+
+.cart-item-delete {
+  color: #fff;
+  background-color: red;
+  padding: 1px 7px;
+  font-size: 14px;
+  border-radius: 40%;
+  max-height: 25px;
+}
+
+.cart__full-price {
+  font-size: 20px;
+  margin-top: 20px;
+}
+
+.cart__view-price {
+  margin-bottom: 30px;
+}

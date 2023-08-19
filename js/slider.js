@@ -23,13 +23,13 @@ function clickHandler(event) {
 
 //Заполнение HTML при переключении табов
 function createActiveTab(tabId) {
+   let html = null;
    if (tabId === "goods") {
-      const html = renderGoods();
-      tabs.after(html);
+      html = renderGoods();
    } else {
-      const html = renderCart();
-      tabs.insertAdjacentHTML("afterend", html)
+      html = renderCart();
    }
+   tabs.after(html)
 }
 
 //Удаление переключенного таба
@@ -57,8 +57,9 @@ const arrayOfProductsInCart = [];
 const tabWithCounter = document.querySelector('button[data-goods-count]');
 function addProductsInCart(product) {
    return () => {
+      product.current++;
       arrayOfProductsInCart.push(product);
-      console.log(arrayOfProductsInCart);
+      console.log(product);
       tabWithCounter.dataset.goodsCount = arrayOfProductsInCart.length;
    }
 
@@ -66,8 +67,9 @@ function addProductsInCart(product) {
 function createProductItem(product) {
    return {
       name: product.name ? product.name : 'Имя неизвестно',
-      price: product.price ? product.price : '0',
+      price: product.price ? product.price : null,
       imgSrc: product.imgSrc ? product.imgSrc : '/img/01.png',
+      current: product.current++,
    }
 }
 
@@ -79,6 +81,7 @@ function renderGoods() {
 
    for (let i = 0; i < goods.length; i++) {
       const product = createProductItem(goods[i]);
+      product.current = 0;
 
       const clickHandler = addProductsInCart(product);
 
@@ -89,38 +92,52 @@ function renderGoods() {
 
       const productBlock = document.createElement('div');
       productBlock.className = "item";
+      const price = product.price === null ? 'Товар закончился' : `${product.price} рублей`;
       productBlock.innerHTML = `
       <img src="${product.imgSrc}" class= "item__img" alt ="t-shirt one">
       <div class="item__descr">
          <p class="item__name">${product.name}</p>
-         <p class="item__price">${product.price}</p>
+         <p class="item__price">${price}</p>
       </div>
       `;
-      productBlock.querySelector('.item__descr').append(button);
+      if (product.price !== null) {
+         productBlock.querySelector('.item__descr').append(button);
+      }
       div.append(productBlock);
    }
    return div;
 }
 
+
 //Контент корзины
 function renderCart() {
-   return `
-   <div data-active-tab-content="true" class="cart-items cart">
-        <div class="cart-item">
-          <div class="cart__name">Серая футболка</div>
-          <div class="cart__count">2 шт.</div>
-          <div class="cart__full-price">3600 рублей</div>
-        </div>
-        <div class="cart-item">
-          <div class="cart__name">Голубая футболка</div>
-          <div class="cart__count">3 шт.</div>
-          <div class="cart__full-price">3600 рублей</div>
-        </div>
-        <div class="cart-item">
-          <div class="cart__name">Майка на выбор</div>
-          <div class="cart__count">1 шт.</div>
-          <div class="cart__full-price">800 рублей</div>
-        </div>
-      </div>
-   `;
+   const div = document.createElement('div');
+   div.dataset.activeTabContent = 'true';
+   div.className = "cart-items cart";
+   let fullPriceOfCart = 0;
+   
+   for (let i = 0; i < arrayOfProductsInCart.length; i++) {
+      let productOfCart = arrayOfProductsInCart[i];
+
+      const button = document.createElement('button');
+      button.className = 'cart-item-delete';
+      button.textContent = 'x';
+
+      const productOfCartBlock = document.createElement('div');
+      productOfCartBlock.className = "cart-item";
+      productOfCartBlock.innerHTML = `
+         <div class="cart__name">${productOfCart.name}</div>
+         <div class="cart__count">${productOfCart.current} шт.</div>
+         <div class= "cart__view-price" >${productOfCart.price} рублей</div>
+         `;
+      productOfCartBlock.append(button);
+      fullPriceOfCart += productOfCart.price;
+      div.append(productOfCartBlock);
+   }
+
+   div.insertAdjacentHTML('beforeend', `
+   <div class="cart__full-price">Итоговая стоимость всех товаров в корзине: ${fullPriceOfCart} рублей.</div>
+   `);
+
+   return div;
 }

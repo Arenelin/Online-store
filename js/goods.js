@@ -10,7 +10,7 @@ const goods = [{
    imgSrc: "/img/02.png",
 }, 
 {
-   name: 'Майка на выбор',
+   name: 'Майка мужская',
    price: 800,
    imgSrc: "/img/03.png",
-}];
+   }];
