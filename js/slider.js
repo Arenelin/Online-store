@@ -20,15 +20,16 @@ function clickHandler(event) {
    createActiveTab(tabActiveId);
 }
 
+
 //Заполнение HTML при переключении табов
 function createActiveTab(tabId) {
-   let html = '';
    if (tabId === "goods") {
-      html = renderGoods();
+      const html = renderGoods();
+      tabs.after(html);
    } else {
-      html = renderCart();
+      const html = renderCart();
+      tabs.insertAdjacentHTML("afterend", html)
    }
-   tabs.insertAdjacentHTML("afterend", html)
 }
 
 //Удаление переключенного таба
@@ -38,7 +39,7 @@ function removeNotActiveTab() {
 }
 
 const tabs = document.querySelector('.tabs');
-tabs.insertAdjacentHTML("afterend", renderGoods());
+tabs.after(renderGoods());
 
 function findActiveBtnTab() {
    return document.querySelector(`button[data-id="${tabActiveId}"]`);
@@ -50,7 +51,7 @@ addListenerForBtns(arrayOfBtnsCart, addProductsInCart);
 
 //Цикл для добавления слушателя к кнопкам
 function addListenerForBtns(elements, callback) {
-   for (let i = 0; i < elements.length; i++){
+   for (let i = 0; i < elements.length; i++) {
       elements[i].addEventListener('click', callback);
    }
 }
@@ -72,34 +73,23 @@ function createProductItem() {
 
 //Контент товаров
 function renderGoods() {
-   return `
-   <div data-active-tab-content="true" class="product-items">
-   <div class="item">
-     <img src="/img/01.png" class= "item__img" alt ="t-shirt one">
+   const div = document.createElement('div');
+   div.dataset.activeTabContent = 'true';
+   div.className = "product-items";
+   for (let i = 0; i < goods.length; i++) {
+      const product = goods[i];
+      div.insertAdjacentHTML('beforeend', `
+      <div class="item">
+     <img src="${product.imgSrc}" class= "item__img" alt ="t-shirt one">
      <div class="item__descr">
-       <p class="item__name">Серая футболка</p>
-       <p class="item__price">1800 рублей</p>
+       <p class="item__name">${product.name}</p>
+       <p class="item__price">${product.price}</p>
        <button data-count="true" class="item__btn">В корзину</button>
      </div>
-   </div>
-   <div class="item">
-     <img src="/img/02.png" class= "item__img" alt ="t-shirt one">
-     <div class="item__descr">
-       <p class="item__name">Голубая футболка</p>
-       <p class="item__price">1200 рублей</p>
-       <button data-count="true" class="item__btn">В корзину</button>
-     </div>
-   </div>
-   <div class="item">
-     <img src="/img/03.png" class= "item__img" alt ="t-shirt one">
-     <div class="item__descr">
-       <p class="item__name">Майка на выбор</p>
-       <p class="item__price">800 рублей</p>
-       <button data-count="true" class="item__btn">В корзину</button>
-     </div>
-   </div>
- </div>
-   `;
+   </div>`);
+   }
+   return div;
+
 }
 
 //Контент корзины
