@@ -52,24 +52,94 @@ function addListenerForBtns(elements, callback) {
    }
 }
 
+
 //Создание массива для заполнения корзины
-const arrayOfProductsInCart = [];
+let  arrayOfProductsInCart = [];
 const tabWithCounter = document.querySelector('button[data-goods-count]');
 function addProductsInCart(product) {
    return () => {
-      product.current++;
-      arrayOfProductsInCart.push(product);
-      console.log(product);
-      tabWithCounter.dataset.goodsCount = arrayOfProductsInCart.length;
+      let hasProduct = false;
+      let index = null;
+      let count = 1;
+      for (let i = 0; i < arrayOfProductsInCart.length; i++) {
+         const productInCart = arrayOfProductsInCart[i];
+         if (product.id === productInCart.id) {
+            hasProduct = true;
+            index = i;
+            count = productInCart.count;
+         }
+      }
+      if (hasProduct) {
+         arrayOfProductsInCart[index].count = count + 1;
+
+      } else {
+         const productWithCount = product;
+         productWithCount.count = count;
+         arrayOfProductsInCart.push(productWithCount);
+      }
+      let fullSize = 0;
+
+      for (let i = 0; i < arrayOfProductsInCart.length; i++) {
+         const productInCart = arrayOfProductsInCart[i];
+         fullSize += productInCart.count;
+      }
+
+      tabWithCounter.dataset.goodsCount = fullSize;
    }
 
 }
+
+function removeProductInCart(productId) {
+   return () => {
+      let newArrayOfProductsInCart = [];
+      for (let i = 0; i < arrayOfProductsInCart.length; i++) {
+         const product = arrayOfProductsInCart[i];
+         if (productId === product.id) {
+            if (product.count > 1) {
+               newArrayOfProductsInCart.push({
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  imgSrc: product.imgSrc,
+                  count: product.count - 1,
+               })
+            } updateCartItem(product.id, product.count);
+         }
+         else {
+            newArrayOfProductsInCart.push(product);
+         }
+      }
+
+      arrayOfProductsInCart = newArrayOfProductsInCart;
+
+      let fullSize = 0;
+
+      for (let i = 0; i < arrayOfProductsInCart.length; i++) {
+         const productInCart = arrayOfProductsInCart[i];
+         fullSize += productInCart.count;
+      }
+
+      tabWithCounter.dataset.goodsCount = fullSize;
+   }
+}
+
 function createProductItem(product) {
    return {
+      id: product.id,
       name: product.name ? product.name : 'Имя неизвестно',
       price: product.price ? product.price : null,
       imgSrc: product.imgSrc ? product.imgSrc : '/img/01.png',
-      current: product.current++,
+   }
+}
+
+
+function updateCartItem(id, count) {
+   const cartItem = document.querySelector(`[data-element-id="${id}"]`);
+   if (count > 1) {
+      const countElement = cartItem.querySelector('.cart__count');
+      countElement.textContent = `${count - 1} шт.`;
+   } else {
+      cartItem.remove();
    }
 }
 
@@ -81,7 +151,6 @@ function renderGoods() {
 
    for (let i = 0; i < goods.length; i++) {
       const product = createProductItem(goods[i]);
-      product.current = 0;
 
       const clickHandler = addProductsInCart(product);
 
@@ -115,7 +184,7 @@ function renderCart() {
    div.dataset.activeTabContent = 'true';
    div.className = "cart-items cart";
    let fullPriceOfCart = 0;
-   
+
    for (let i = 0; i < arrayOfProductsInCart.length; i++) {
       let productOfCart = arrayOfProductsInCart[i];
 
@@ -124,12 +193,15 @@ function renderCart() {
       button.textContent = 'x';
 
       const productOfCartBlock = document.createElement('div');
+      productOfCartBlock.dataset.elementId = productOfCart.id;
       productOfCartBlock.className = "cart-item";
       productOfCartBlock.innerHTML = `
          <div class="cart__name">${productOfCart.name}</div>
-         <div class="cart__count">${productOfCart.current} шт.</div>
+         <div class="cart__count">${productOfCart.count} шт.</div>
          <div class= "cart__view-price" >${productOfCart.price} рублей</div>
          `;
+      const clickHandler = removeProductInCart(productOfCart.id);
+      button.addEventListener('click', clickHandler);
       productOfCartBlock.append(button);
       fullPriceOfCart += productOfCart.price;
       div.append(productOfCartBlock);
